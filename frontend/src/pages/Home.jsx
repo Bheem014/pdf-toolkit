@@ -1,15 +1,15 @@
 import Hero from "../components/Hero";
-import UploadBox from "../components/UploadBox";
 import ToolGrid from "../components/ToolGrid";
 import Features from "../components/Features";
+import Footer from "../components/Footer";
 
 function Home() {
   return (
     <>
       <Hero />
-      <UploadBox />
       <ToolGrid />
       <Features />
+      <Footer />
     </>
   );
 }

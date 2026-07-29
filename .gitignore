@@ -42,3 +42,9 @@ logs/
 # -----------------------------
 Thumbs.db
 .DS_Store
+
+# Runtime folders
+backend/uploads/*
+backend/outputs/*
+backend/temp/*
+backend/logs/*

@@ -1,46 +1,65 @@
-import { FileText, Moon } from "lucide-react";
+import { Moon, FileText } from "lucide-react";
 
 function Navbar() {
   return (
-    <nav className="sticky top-0 z-50 border-b bg-white/80 backdrop-blur-lg">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-8 py-5">
+    <header className="sticky top-0 z-50 border-b border-slate-200/50 bg-white/80 backdrop-blur-md">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
 
         {/* Logo */}
         <div className="flex items-center gap-3 cursor-pointer">
-          <FileText size={34} className="text-blue-600" />
+          <div className="rounded-xl bg-blue-600 p-2 text-white shadow-md">
+            <FileText size={22} />
+          </div>
 
-          <h1 className="text-3xl font-extrabold text-blue-600">
-            PDF Toolkit
-          </h1>
+          <div>
+            <h1 className="text-xl font-bold text-slate-900">
+              PDF Toolkit
+            </h1>
+            <p className="text-xs text-slate-500">
+              Fast • Secure • Free
+            </p>
+          </div>
         </div>
 
         {/* Navigation */}
-        <ul className="hidden md:flex items-center gap-10 font-medium text-slate-700">
-
-          <li className="cursor-pointer transition hover:text-blue-600">
+        <nav className="hidden items-center gap-8 font-medium text-slate-700 md:flex">
+          <a href="#" className="transition hover:text-blue-600">
             Home
-          </li>
+          </a>
 
-          <li className="cursor-pointer transition hover:text-blue-600">
+          <a href="#tools" className="transition hover:text-blue-600">
             Tools
-          </li>
+          </a>
 
-          <li className="cursor-pointer transition hover:text-blue-600">
+          <a href="#about" className="transition hover:text-blue-600">
             About
-          </li>
+          </a>
 
-          <li className="cursor-pointer transition hover:text-blue-600">
+          <a href="#contact" className="transition hover:text-blue-600">
             Contact
-          </li>
+          </a>
+        </nav>
 
-        </ul>
+        {/* Right Side */}
+        <div className="flex items-center gap-3">
 
-        <button className="rounded-full border p-3 transition hover:bg-slate-100">
-          <Moon size={22} />
-        </button>
+          <button
+            className="rounded-xl border border-slate-300 p-2 transition hover:bg-slate-100"
+            title="Dark Mode (Coming Soon)"
+          >
+            <Moon size={20} />
+          </button>
+
+          <button
+            className="rounded-xl bg-blue-600 px-5 py-2.5 font-semibold text-white shadow-md transition hover:bg-blue-700 hover:shadow-lg"
+          >
+            Get Started
+          </button>
+
+        </div>
 
       </div>
-    </nav>
+    </header>
   );
 }
 
