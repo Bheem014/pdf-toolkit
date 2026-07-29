@@ -17,7 +17,10 @@ function UploadBox() {
   const [isDragging, setIsDragging] = useState(false);
   const [error, setError] = useState("");
   const [uploadSuccess, setUploadSuccess] = useState(false);
-
+  const [compressing, setCompressing] = useState(false);
+  const [compressedData, setCompressedData] = useState(null);
+  const [uploadedFilename, setUploadedFilename] = useState("");
+  const [compressionLevel, setCompressionLevel] = useState("medium");
   const resetFile = () => {
     setSelectedFile(null);
     setFileName("");
@@ -70,45 +73,70 @@ function UploadBox() {
   };
 
   const handleUpload = async () => {
-    if (!selectedFile) return;
+  if (!selectedFile) return;
 
-    setIsUploading(true);
-    setUploadStatus("");
-    setUploadProgress(0);
+  setIsUploading(true);
+  setUploadStatus("");
+  setUploadProgress(0);
 
-    const formData = new FormData();
-    formData.append("file", selectedFile);
+  const formData = new FormData();
+  formData.append("file", selectedFile);
 
-    try {
-      const response = await api.post("/upload", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+  try {
+    const response = await api.post("/upload", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
 
-        onUploadProgress: (progressEvent) => {
-          const percent = Math.round(
-            (progressEvent.loaded * 100) / progressEvent.total
-          );
+      onUploadProgress: (progressEvent) => {
+        const percent = Math.round(
+          (progressEvent.loaded * 100) / progressEvent.total
+        );
 
-          setUploadProgress(percent);
-        },
-      });
+        setUploadProgress(percent);
+      },
+    });
 
-      setUploadStatus(response.data.message);
-      setUploadSuccess(true);
-    } catch (err) {
-      if (err.response) {
-        setError("Server rejected the upload.");
-      } else if (err.request) {
-        setError("Cannot connect to the server.");
-      } else {
-        setError("Unexpected error occurred.");
-      }
-    } finally {
-      setIsUploading(false);
+    setUploadStatus(response.data.message);
+    setUploadedFilename(response.data.filename);
+    setUploadSuccess(true);
+  } catch (err) {
+    if (err.response) {
+      setError("Server rejected the upload.");
+    } else if (err.request) {
+      setError("Cannot connect to the server.");
+    } else {
+      setError("Unexpected error occurred.");
     }
-  };
+  } finally {
+    setIsUploading(false);
+  }
+};
 
+const handleCompress = async () => {
+  if (!uploadedFilename) {
+    alert("Please upload a PDF first.");
+    return;
+  }
+
+  try {
+    setCompressing(true);
+
+    const response = await api.post("/compress", null, {
+  params: {
+    filename: uploadedFilename,
+    level: compressionLevel,
+  },
+});
+
+    setCompressedData(response.data);
+  } catch (err) {
+    console.error(err);
+    alert("Compression failed.");
+  } finally {
+    setCompressing(false);
+  }
+};
   return (
     <section className="mx-auto max-w-6xl px-6 py-16">
       <div
@@ -217,11 +245,78 @@ function UploadBox() {
               Ready for processing
             </p>
 
+            <div className="mt-8 text-left">
+              <label className="mb-2 block text-sm font-semibold text-gray-700">
+                Compression Level
+              </label>
+
+              <select
+                value={compressionLevel}
+                onChange={(e) => setCompressionLevel(e.target.value)}
+                className="w-full rounded-xl border border-gray-300 p-3 focus:border-blue-500 focus:outline-none"
+              >
+                <option value="low">🟢 Low (Best Quality)</option>
+                <option value="medium">🟡 Medium (Recommended)</option>
+                <option value="high">🔴 High (Maximum Compression)</option>
+              </select>
+
+              <p className="mt-2 text-sm text-gray-500">
+                {compressionLevel === "low" &&
+                  "Keeps the highest quality with minimal compression."}
+
+                {compressionLevel === "medium" &&
+                  "Balanced compression and quality."}
+
+                {compressionLevel === "high" &&
+                  "Maximum compression. Image quality may decrease."}
+              </p>
+            </div>
+
             <button
-              className="mt-8 rounded-xl bg-blue-600 px-8 py-3 font-semibold text-white hover:bg-blue-700"
+              onClick={handleCompress}
+              disabled={compressing}
+              className="mt-8 w-full rounded-xl bg-purple-600 px-8 py-3 font-semibold text-white transition hover:bg-purple-700 disabled:opacity-50"
             >
-              Compress PDF
+              {compressing ? "Compressing..." : "Compress PDF"}
             </button>
+
+            {compressedData && (
+  <div className="mt-8 rounded-2xl border border-green-300 bg-green-50 p-6 text-left">
+
+    <h3 className="mb-4 text-xl font-bold text-green-700">
+      ✅ Compression Complete
+    </h3>
+
+    <p>
+      <strong>Original Size:</strong>{" "}
+      {(compressedData.original_size / 1024 / 1024).toFixed(2)} MB
+    </p>
+
+    <p className="mt-2">
+      <strong>Compressed Size:</strong>{" "}
+      {(compressedData.compressed_size / 1024 / 1024).toFixed(2)} MB
+    </p>
+
+    <p className="mt-2">
+      <strong>Saved:</strong>{" "}
+      {(
+        ((compressedData.original_size -
+          compressedData.compressed_size) /
+          compressedData.original_size) *
+        100
+      ).toFixed(1)}
+      %
+    </p>
+
+    <a
+      href={`http://127.0.0.1:8000/download/${compressedData.filename}`}
+      className="mt-6 inline-block rounded-xl bg-green-600 px-6 py-3 font-semibold text-white hover:bg-green-700"
+    >
+      Download Compressed PDF
+    </a>
+
+  </div>
+)}
 
           </div>
         )}

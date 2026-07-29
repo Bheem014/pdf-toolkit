@@ -1,7 +1,6 @@
 import Hero from "../components/Hero";
 import ToolGrid from "../components/ToolGrid";
 import Features from "../components/Features";
-import Footer from "../components/Footer";
 
 function Home() {
   return (
@@ -9,7 +8,6 @@ function Home() {
       <Hero />
       <ToolGrid />
       <Features />
-      <Footer />
     </>
   );
 }

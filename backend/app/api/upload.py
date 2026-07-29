@@ -22,5 +22,7 @@ async def upload_pdf(file: UploadFile = File(...)):
         "success": True,
         "filename": file.filename,
         "content_type": file.content_type,
-        "message": "PDF uploaded successfully"
+        "message": "File uploaded successfully.",
+        "filename": file.filename,
+        "size": file.size if hasattr(file, "size") else None
     }
